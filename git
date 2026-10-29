@@ -1,1 +1,460 @@
 
+TASK 12: VERSION CONTROL SYSTEM — GIT
+
+Lab External Practical Guide | Normal Command Prompt + Visual Studio Code
+
+Aim: To learn local Git operations, GitHub remote repositories, branching and merging, merge-conflict resolution, reset and stash operations, and setting up a simple on-premises Git repository.
+
+Before starting: one-time setup
+
+Step 1: Install Git
+
+Install Git for Windows from https://git-scm.com/download/win. During installation, the default options are usually fine.
+
+Step 2: Check installation
+
+git --version
+
+Step 3: Configure your identity
+
+Use your own name and the email associated with your GitHub account.
+
+git config --global user.name "Your Name"
+git config --global user.email "your-email@example.com"
+git config --list
+
+Step 4: Install/open VS Code (optional)
+
+Install Visual Studio Code from https://code.visualstudio.com/. Git support is built into VS Code, but Git must be installed separately.
+
+Important: Replace YOUR-USERNAME, YOUR-EMAIL, and SERVERNAME with your real values. Run commands from the folder mentioned in each task.
+
+Task 12(a): Working locally with Git
+
+Aim: Create a local repository, track a file, commit changes, and view history.
+
+Method A — Normal Command Prompt
+
+1. Create a folder and file
+
+mkdir GitLab
+cd GitLab
+echo Hello Git > index.txt
+
+2. Initialize a Git repository
+
+git init
+
+3. Check the status
+
+git status
+
+4. Stage the file
+
+git add index.txt
+
+5. Commit the file
+
+git commit -m "First commit"
+
+6. View the commit history
+
+git log --oneline
+
+Method B — Using VS Code
+
+1. Open the folder
+
+Open VS Code → File → Open Folder → select the GitLab folder. If it does not exist, create it first.
+
+2. Create a file
+
+In the Explorer panel, click New File, name it index.txt, type Hello Git, and save with Ctrl+S.
+
+3. Open the integrated terminal
+
+Choose Terminal → New Terminal. The terminal should open in the project folder.
+
+4. Initialize Git
+
+git init
+
+5. Stage and commit
+
+Click the Source Control icon on the left. Under Changes, click the + beside index.txt to stage it. Type First commit in the message box and click Commit. If prompted, confirm the commit.
+
+6. Verify
+
+Use the integrated terminal:
+
+git status
+git log --oneline
+
+Task 12(b): Working remotely with GitHub
+
+Aim: Connect a local repository to GitHub, push commits, and clone a repository.
+
+Method A — Normal Command Prompt
+
+1. Create an online repository
+
+Sign in at https://github.com → click + → New repository → name it GitLab. For this exercise, do not initialize it with a README, license, or .gitignore.
+
+2. From inside the local GitLab folder, connect the remote
+
+git branch -M main
+git remote add origin https://github.com/YOUR-USERNAME/GitLab.git
+
+3. Push to GitHub
+
+git push -u origin main
+
+4. Clone to another folder
+
+Move to a parent folder first, then run:
+
+cd ..
+git clone https://github.com/YOUR-USERNAME/GitLab.git
+
+Method B — Using VS Code
+
+1. Open your local GitLab folder in VS Code.
+
+2. Add the remote in the terminal
+
+git remote add origin https://github.com/YOUR-USERNAME/GitLab.git
+git branch -M main
+
+3. Push
+
+Run this in the integrated terminal:
+
+git push -u origin main
+
+4. Sign in if asked
+
+Complete the browser sign-in/authorization prompt. Check the repository page on GitHub to confirm the files are uploaded.
+
+5. Clone through VS Code
+
+Press Ctrl+Shift+P → type Git: Clone → choose Clone from URL → paste the repository URL → choose a local folder → click Open when prompted.
+
+Task 12(c): Branching and merging
+
+Aim: Create a separate branch, make a change, and merge it into main.
+
+Method A — Normal Command Prompt
+
+1. Create and switch to a feature branch
+
+git switch -c feature
+
+2. Make a change and commit it
+
+echo Feature added >> index.txt
+git add index.txt
+git commit -m "Added feature"
+
+3. Return to main and merge
+
+git switch main
+git merge feature
+
+4. Check branches
+
+git branch
+
+Method B — Using VS Code
+
+1. Create branch
+
+Click the branch name in the lower-left status bar → select Create new branch → enter feature.
+
+2. Change and commit
+
+Edit index.txt, save it, open Source Control, stage the file with +, enter Added feature, and click Commit.
+
+3. Switch to main
+
+Click the branch name in the lower-left corner and select main.
+
+4. Merge
+
+Use the integrated terminal:
+
+git merge feature
+
+5. Verify
+
+git log --oneline --graph --all
+
+Task 12(d): Resolve a merge conflict
+
+Aim: Create a conflict by changing the same line on two branches, then resolve it.
+
+Method A — Normal Command Prompt
+
+1. Ensure you are on main and create a starter file
+
+git switch main
+echo Hello World > conflict.txt
+git add conflict.txt
+git commit -m "Add conflict file"
+
+2. Change the file on main
+
+echo Hello from main > conflict.txt
+git add conflict.txt
+git commit -m "Update on main"
+
+3. Create another branch from the earlier commit
+
+Create the branch from the parent commit so it has a different version of the same line:
+
+git switch -c test HEAD~1
+
+4. Change the same line on test
+
+echo Hello from test > conflict.txt
+git add conflict.txt
+git commit -m "Update on test"
+
+5. Merge test into main
+
+git switch main
+git merge test
+
+Git should report a conflict. Open conflict.txt. It may contain markers like these:
+
+<<<<<<< HEAD
+Hello from main
+=======
+Hello from test
+>>>>>>> test
+
+6. Resolve
+
+Replace all conflict-marker lines with the final text below, then save the file.
+
+Hello from main and test
+
+7. Complete the merge
+
+git add conflict.txt
+git commit -m "Resolve merge conflict"
+
+Method B — Using VS Code
+
+1. Reproduce the conflict
+
+Follow the Command Prompt steps above in VS Code's integrated terminal. This ensures both branches modify the same line.
+
+2. Open the conflicted file
+
+VS Code shows conflict actions such as Accept Current Change, Accept Incoming Change, Accept Both Changes, and Compare Changes.
+
+3. Resolve
+
+Choose an option or edit the file manually. For this exercise, keep the final text: Hello from main and test. Remove all <<<<<<<, =======, and >>>>>>> markers.
+
+4. Save, stage, and commit
+
+Save the file. In Source Control, stage conflict.txt and commit with message Resolve merge conflict. Alternatively run:
+
+git add conflict.txt
+git commit -m "Resolve merge conflict"
+
+Task 12(e): Git reset and stash operations
+
+Part A — Reset
+
+Practice reset only in a test repository. The --hard option can discard uncommitted tracked changes.
+
+1. Make a test commit
+
+echo Second version >> index.txt
+git add index.txt
+git commit -m "Second version"
+git log --oneline
+
+2. Soft reset example
+
+Removes the latest commit but keeps its changes staged. Use this in a practice repository:
+
+git reset --soft HEAD~1
+git status
+
+3. Mixed reset example
+
+Removes the latest commit and unstages its changes while keeping working-tree changes:
+
+git reset --mixed HEAD~1
+git status
+
+4. Hard reset example — caution
+
+Only use this when you are certain you want to discard the latest commit and associated tracked changes. Do not use on important work:
+
+git reset --hard HEAD~1
+
+Part B — Stash
+
+1. Make an uncommitted change
+
+echo Temporary change >> index.txt
+
+2. Save it temporarily
+
+git stash push -m "Temporary work"
+
+3. List saved stashes
+
+git stash list
+
+4. Restore the latest stash
+
+git stash pop
+
+Using VS Code for reset and stash
+
+Stash
+
+Open Source Control → click the ... menu → Stash → Stash (wording can vary by version). To restore, use the ... menu → Stash → Apply or Pop Stash. The integrated terminal commands are the most reliable fallback.
+
+Reset
+
+Use the integrated terminal for the reset commands so you can specify --soft, --mixed, or --hard exactly. Check git status and git log --oneline after each operation.
+
+Task 12(f): Set up Git on on-premises hardware
+
+On-premises means the repository is hosted on a computer/server controlled by the college or organization. The following is a simple shared-folder demonstration; the server folder must be shared on the network and users must have appropriate permissions.
+
+Method A — Server and client Command Prompt
+
+1. On the server computer, create a bare repository
+
+Use a path on the server that is suitable for sharing:
+
+mkdir D:\GitServer
+git init --bare D:\GitServer\project.git
+
+2. Share the folder
+
+Share D:\GitServer using Windows folder sharing and grant the client user suitable read/write permissions. Use the actual server name and share name.
+
+3. On the client, create a local project
+
+mkdir LocalProject
+cd LocalProject
+git init
+echo Hello Server > index.txt
+git add index.txt
+git commit -m "First commit"
+
+4. Add the remote and push
+
+Replace the example path with the real UNC path to the shared repository:
+
+git remote add origin \\SERVERNAME\GitServer\project.git
+git branch -M main
+git push -u origin main
+
+5. Clone on a second client
+
+git clone \\SERVERNAME\GitServer\project.git
+
+Method B — Using VS Code
+
+1. On the server
+
+Open the server folder in VS Code's terminal and run:
+
+git init --bare D:\GitServer\project.git
+
+2. On the client
+
+Open the LocalProject folder in VS Code, then use the terminal commands from steps 3 and 4 above.
+
+3. Verify
+
+Run git remote -v and git log --oneline. A real multi-user server should also have proper authentication, backups, and access controls. For larger teams, a managed Git hosting service on internal hardware may be preferable.
+
+Common problems and fixes
+
+Problem
+
+Fix
+
+'git' is not recognized
+
+Install Git for Windows, close and reopen Command Prompt/VS Code, then run git --version.
+
+Author identity unknown
+
+Run git config --global user.name "Your Name" and git config --global user.email "your-email@example.com".
+
+Remote origin already exists
+
+Run git remote -v. Update it with git remote set-url origin REPOSITORY_URL, or remove and re-add the remote if appropriate.
+
+Push rejected
+
+Check that the remote URL is correct and that you have permission. If the remote has commits not present locally, inspect the history before integrating changes.
+
+No merge conflict appears
+
+The two branches may not have changed the same line. Recreate the exercise from the correct parent commit and edit the same line on both branches.
+
+Shared-folder remote cannot be accessed
+
+Check that the share path is correct, the server is online, and the client has read/write permission.
+
+Viva questions — short answers
+
+What is Git? A distributed version control system.
+
+What is GitHub? An online platform for hosting Git repositories.
+
+What is a repository? A folder/database that tracks project files and history.
+
+What is a commit? A saved snapshot of staged changes.
+
+What is a branch? An independent line of development.
+
+What is merging? Combining changes from one branch into another.
+
+What is a merge conflict? A conflict Git cannot automatically resolve.
+
+What does git stash do? Temporarily saves uncommitted changes.
+
+What does git reset do? Moves the branch pointer and may alter staging or working files.
+
+What is a bare repository? A repository without a checked-out working tree, commonly used as a shared remote.
+
+What does git clone do? Creates a local copy of a repository.
+
+What does git push do? Uploads local commits to a remote repository.
+
+Quick command revision
+
+git init
+git status
+git add .
+git commit -m "message"
+git log --oneline
+git remote add origin REPOSITORY_URL
+git push -u origin main
+git clone REPOSITORY_URL
+git switch -c feature
+git switch main
+git merge feature
+git stash push -m "Temporary work"
+git stash list
+git stash pop
+git reset --soft HEAD~1
+git reset --mixed HEAD~1
+
+Lab tip: Start each exercise in the correct project folder. Verify the result with git status, git log --oneline, or the GitHub repository page. Never use git reset --hard on work you need to keep.
+
+Task 12 — Git Lab External Guide  |  Page 
+
